@@ -3,7 +3,11 @@ import random
 import time
 from datetime import datetime, timezone
 
-CONTAINER_IDS = ["CNT-1001", "CNT-1002", "CNT-1003", "CNT-1004"]
+CONTAINER_IDS = [
+    "CNT-1001","CNT-1002","CNT-1003","CNT-1004",
+    "CNT-1005","CNT-1006","CNT-1007","CNT-1008",
+    "CNT-1009","CNT-1010","CNT-1011","CNT-1012"
+]
 
 BASELINE_TEMP_RANGE = (2.0, 8.0)
 BASELINE_HUMIDITY_RANGE = (40.0, 70.0)

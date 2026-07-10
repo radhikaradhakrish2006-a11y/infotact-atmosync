@@ -18,7 +18,7 @@ app.add_middleware(
 def get_snowflake_conn():
     return snowflake.connector.connect(
         user="RADHIKA",
-        password="Radhika56@2006",  # <-- உங்கள் Password போடுங்க
+        password="Radhika56@2006",  
         account="TZBNHXF-QN62223",
         warehouse="COMPUTE_WH",
         database="ATMOSYNC_DB",

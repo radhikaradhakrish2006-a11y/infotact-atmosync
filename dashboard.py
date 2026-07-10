@@ -6,7 +6,7 @@ import random
 
 app = FastAPI()
 
-# CORS - HTML-ல இருந்து API call பண்ண allow பண்ணும்
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

@@ -65,7 +65,6 @@ def get_dashboard_data():
         SELECT TIMESTAMP, CONTAINER_ID, TEMPERATURE_C
         FROM SENSOR_DATA
         WHERE TEMPERATURE_C > 30
-        ORDER BY TIMESTAMP DESC LIMIT 5
     """)
     alerts = cur.fetchall()
     

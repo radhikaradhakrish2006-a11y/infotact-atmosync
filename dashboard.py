@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import snowflake.connector
 from datetime import datetime, timedelta
-import random
 
 app = FastAPI()
 
@@ -24,13 +23,12 @@ def get_snowflake_conn():
         schema="PUBLIC"
     )
 
-# ─── EXISTING MONITORING API ───
+# ─── MONITORING API ───
 @app.get("/api/dashboard")
 def get_dashboard_data():
     conn = get_snowflake_conn()
     cur = conn.cursor()
 
-    # 1. Summary Stats
     cur.execute("""
         SELECT
             COUNT(DISTINCT CONTAINER_ID) as total_sensors,
@@ -49,7 +47,6 @@ def get_dashboard_data():
     """)
     stats = cur.fetchone()
 
-    # 2. Temperature Trend (Last 7 days)
     cur.execute("""
         SELECT DATE(TIMESTAMP) as day, AVG(TEMPERATURE_C) as temp
         FROM SENSOR_DATA
@@ -58,7 +55,6 @@ def get_dashboard_data():
     """)
     temp_trend = cur.fetchall()
 
-    # 3. Humidity Trend (Last 7 days)
     cur.execute("""
         SELECT DATE(TIMESTAMP) as day, AVG(HUMIDITY_PCT) as hum
         FROM SENSOR_DATA
@@ -67,7 +63,6 @@ def get_dashboard_data():
     """)
     hum_trend = cur.fetchall()
 
-    # 4. Recent Alerts (Top 5)
     cur.execute("""
         SELECT TIMESTAMP, CONTAINER_ID, TEMPERATURE_C
         FROM SENSOR_DATA
@@ -78,7 +73,6 @@ def get_dashboard_data():
 
     conn.close()
 
-    # Format Response
     days = [str(d[0]) for d in temp_trend] if temp_trend else ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     temps = [float(d[1]) for d in temp_trend] if temp_trend else [20, 22, 25, 24, 26, 28, 27]
     hums = [float(d[1]) for d in hum_trend] if hum_trend else [50, 55, 52, 60, 58, 62, 65]
@@ -97,13 +91,10 @@ def get_dashboard_data():
         },
         "alerts": [
             {"time": str(a[0]), "sensor": a[1], "temp": float(a[2])} for a in alerts
-        ],
-        "top_sensors": [
-            {"id": s[0], "temp": float(s[1])} for s in top_sensors
         ]
     }
 
-# ─── NEW ANALYTICS API ───
+# ─── ANALYTICS API ───
 @app.get("/api/analytics")
 def get_analytics_data():
     conn = get_snowflake_conn()
@@ -115,8 +106,7 @@ def get_analytics_data():
             CONTAINER_ID,
             AVG(TEMPERATURE_C) as avg_temp,
             AVG(HUMIDITY_PCT) as avg_hum,
-            AVG(VIBRATION_LEVEL) as avg_vib,
-            COUNT(*) as readings
+            AVG(VIBRATION_LEVEL) as avg_vib
         FROM SENSOR_DATA
         WHERE TIMESTAMP >= DATEADD(day, -7, CURRENT_TIMESTAMP())
         GROUP BY CONTAINER_ID
@@ -130,11 +120,12 @@ def get_analytics_data():
         WHERE TIMESTAMP >= DATEADD(hour, -24, CURRENT_TIMESTAMP())
           AND (TEMPERATURE_C > 30 OR HUMIDITY_PCT > 70 OR VIBRATION_LEVEL > 4)
     """)
-    total_alerts_count = cur.fetchone()[0] or 0
+    result = cur.fetchone()
+    total_alerts_count = result[0] if result else 0
 
     conn.close()
 
-    # If no data in Snowflake, return mock data (so UI doesn't break)
+    # If no data in Snowflake, return Mock Data
     if not containers:
         return {
             "summary": {
@@ -170,23 +161,20 @@ def get_analytics_data():
             ]
         }
 
-    # Calculate Spoilage Score & Risk for each container
+    # Calculate Spoilage Score & Risk
     container_list = []
     high_risk = 0
     medium_risk = 0
     low_risk = 0
 
     for c in containers:
-        cid, avg_temp, avg_hum, avg_vib, readings = c
+        cid, avg_temp, avg_hum, avg_vib = c
 
-        # Spoilage Score formula (0-100)
-        # Temperature weight: 60%, Humidity: 30%, Vibration: 10%
-        temp_score = min(100, max(0, (avg_temp - 2) / 28 * 100))  # baseline 2°C
-        hum_score = min(100, max(0, (avg_hum - 40) / 40 * 100))    # baseline 40%
-        vib_score = min(100, max(0, avg_vib / 5 * 100))            # baseline 5mm/s
+        temp_score = min(100, max(0, (avg_temp - 2) / 28 * 100))
+        hum_score = min(100, max(0, (avg_hum - 40) / 40 * 100))
+        vib_score = min(100, max(0, avg_vib / 5 * 100))
         score = round((temp_score * 0.6) + (hum_score * 0.3) + (vib_score * 0.1), 2)
 
-        # Risk Level
         if score > 60:
             risk = 'High'
             high_risk += 1
@@ -199,18 +187,15 @@ def get_analytics_data():
 
         container_list.append({"id": cid, "score": score, "risk": risk})
 
-    # Sort by score descending
     container_list.sort(key=lambda x: x["score"], reverse=True)
-    top_8 = container_list[:8]
 
-    # Avg Spoilage Score
     avg_spoilage = round(sum(c["score"] for c in container_list) / len(container_list), 2) if container_list else 0
 
     return {
         "summary": {
             "avg_spoilage_score": avg_spoilage,
             "high_risk_containers": high_risk,
-            "reroute_recommended": high_risk,  # High risk containers need reroute
+            "reroute_recommended": high_risk,
             "total_alerts": total_alerts_count
         },
         "risk_distribution": {
@@ -218,6 +203,6 @@ def get_analytics_data():
             "medium": medium_risk,
             "low": low_risk
         },
-        "top_containers": top_8,
+        "top_containers": container_list[:8],
         "all_containers": container_list
     }

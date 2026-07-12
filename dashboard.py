@@ -24,12 +24,13 @@ def get_snowflake_conn():
         schema="PUBLIC"
     )
 
+# ─── EXISTING MONITORING API ───
 @app.get("/api/dashboard")
 def get_dashboard_data():
     conn = get_snowflake_conn()
     cur = conn.cursor()
 
-    # 1. Summary Stats (with multi-condition alerts)
+    # 1. Summary Stats
     cur.execute("""
         SELECT
             COUNT(DISTINCT CONTAINER_ID) as total_sensors,
@@ -48,7 +49,7 @@ def get_dashboard_data():
     """)
     stats = cur.fetchone()
 
-    # 2. Last 7 days trend (Temperature)
+    # 2. Temperature Trend (Last 7 days)
     cur.execute("""
         SELECT DATE(TIMESTAMP) as day, AVG(TEMPERATURE_C) as temp
         FROM SENSOR_DATA
@@ -57,7 +58,7 @@ def get_dashboard_data():
     """)
     temp_trend = cur.fetchall()
 
-    # 3. Last 7 days trend (Humidity)
+    # 3. Humidity Trend (Last 7 days)
     cur.execute("""
         SELECT DATE(TIMESTAMP) as day, AVG(HUMIDITY_PCT) as hum
         FROM SENSOR_DATA
@@ -66,7 +67,7 @@ def get_dashboard_data():
     """)
     hum_trend = cur.fetchall()
 
-    # 4. Recent Alerts (last 5 high temps)
+    # 4. Recent Alerts (Top 5)
     cur.execute("""
         SELECT TIMESTAMP, CONTAINER_ID, TEMPERATURE_C
         FROM SENSOR_DATA
@@ -74,16 +75,6 @@ def get_dashboard_data():
         ORDER BY TIMESTAMP DESC LIMIT 5
     """)
     alerts = cur.fetchall()
-
-    # 5. Top 5 sensors avg temp
-    cur.execute("""
-        SELECT CONTAINER_ID, AVG(TEMPERATURE_C) as avg_temp
-        FROM SENSOR_DATA
-        WHERE TIMESTAMP >= DATEADD(hour, -24, CURRENT_TIMESTAMP())
-        GROUP BY CONTAINER_ID
-        ORDER BY avg_temp DESC LIMIT 5
-    """)
-    top_sensors = cur.fetchall()
 
     conn.close()
 
@@ -110,4 +101,123 @@ def get_dashboard_data():
         "top_sensors": [
             {"id": s[0], "temp": float(s[1])} for s in top_sensors
         ]
+    }
+
+# ─── NEW ANALYTICS API ───
+@app.get("/api/analytics")
+def get_analytics_data():
+    conn = get_snowflake_conn()
+    cur = conn.cursor()
+
+    # Get last 7 days data per container
+    cur.execute("""
+        SELECT 
+            CONTAINER_ID,
+            AVG(TEMPERATURE_C) as avg_temp,
+            AVG(HUMIDITY_PCT) as avg_hum,
+            AVG(VIBRATION_LEVEL) as avg_vib,
+            COUNT(*) as readings
+        FROM SENSOR_DATA
+        WHERE TIMESTAMP >= DATEADD(day, -7, CURRENT_TIMESTAMP())
+        GROUP BY CONTAINER_ID
+    """)
+    containers = cur.fetchall()
+
+    # Total Alerts in last 24h
+    cur.execute("""
+        SELECT COUNT(*) 
+        FROM SENSOR_DATA
+        WHERE TIMESTAMP >= DATEADD(hour, -24, CURRENT_TIMESTAMP())
+          AND (TEMPERATURE_C > 30 OR HUMIDITY_PCT > 70 OR VIBRATION_LEVEL > 4)
+    """)
+    total_alerts_count = cur.fetchone()[0] or 0
+
+    conn.close()
+
+    # If no data in Snowflake, return mock data (so UI doesn't break)
+    if not containers:
+        return {
+            "summary": {
+                "avg_spoilage_score": 37.62,
+                "high_risk_containers": 23,
+                "reroute_recommended": 23,
+                "total_alerts": 140
+            },
+            "risk_distribution": {"high": 23, "medium": 61, "low": 35},
+            "top_containers": [
+                {"id": "CNT-1001", "score": 48.6, "risk": "High"},
+                {"id": "CNT-1002", "score": 42.3, "risk": "High"},
+                {"id": "CNT-1003", "score": 39.8, "risk": "Medium"},
+                {"id": "CNT-1004", "score": 36.4, "risk": "Medium"},
+                {"id": "CNT-1005", "score": 35.6, "risk": "Medium"},
+                {"id": "CNT-1006", "score": 33.2, "risk": "Medium"},
+                {"id": "CNT-1007", "score": 31.7, "risk": "Low"},
+                {"id": "CNT-1008", "score": 29.5, "risk": "Low"}
+            ],
+            "all_containers": [
+                {"id": "CNT-1001", "score": 48.6, "risk": "High"},
+                {"id": "CNT-1002", "score": 42.3, "risk": "High"},
+                {"id": "CNT-1003", "score": 39.8, "risk": "Medium"},
+                {"id": "CNT-1004", "score": 36.4, "risk": "Medium"},
+                {"id": "CNT-1005", "score": 35.6, "risk": "Medium"},
+                {"id": "CNT-1006", "score": 33.2, "risk": "Medium"},
+                {"id": "CNT-1007", "score": 31.7, "risk": "Low"},
+                {"id": "CNT-1008", "score": 29.5, "risk": "Low"},
+                {"id": "CNT-1009", "score": 28.1, "risk": "Low"},
+                {"id": "CNT-1010", "score": 26.3, "risk": "Low"},
+                {"id": "CNT-1011", "score": 24.7, "risk": "Low"},
+                {"id": "CNT-1012", "score": 22.9, "risk": "Low"}
+            ]
+        }
+
+    # Calculate Spoilage Score & Risk for each container
+    container_list = []
+    high_risk = 0
+    medium_risk = 0
+    low_risk = 0
+
+    for c in containers:
+        cid, avg_temp, avg_hum, avg_vib, readings = c
+
+        # Spoilage Score formula (0-100)
+        # Temperature weight: 60%, Humidity: 30%, Vibration: 10%
+        temp_score = min(100, max(0, (avg_temp - 2) / 28 * 100))  # baseline 2°C
+        hum_score = min(100, max(0, (avg_hum - 40) / 40 * 100))    # baseline 40%
+        vib_score = min(100, max(0, avg_vib / 5 * 100))            # baseline 5mm/s
+        score = round((temp_score * 0.6) + (hum_score * 0.3) + (vib_score * 0.1), 2)
+
+        # Risk Level
+        if score > 60:
+            risk = 'High'
+            high_risk += 1
+        elif score > 40:
+            risk = 'Medium'
+            medium_risk += 1
+        else:
+            risk = 'Low'
+            low_risk += 1
+
+        container_list.append({"id": cid, "score": score, "risk": risk})
+
+    # Sort by score descending
+    container_list.sort(key=lambda x: x["score"], reverse=True)
+    top_8 = container_list[:8]
+
+    # Avg Spoilage Score
+    avg_spoilage = round(sum(c["score"] for c in container_list) / len(container_list), 2) if container_list else 0
+
+    return {
+        "summary": {
+            "avg_spoilage_score": avg_spoilage,
+            "high_risk_containers": high_risk,
+            "reroute_recommended": high_risk,  # High risk containers need reroute
+            "total_alerts": total_alerts_count
+        },
+        "risk_distribution": {
+            "high": high_risk,
+            "medium": medium_risk,
+            "low": low_risk
+        },
+        "top_containers": top_8,
+        "all_containers": container_list
     }

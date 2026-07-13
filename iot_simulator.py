@@ -50,6 +50,4 @@ def run_simulator(interval_seconds=2.0, total_ticks=10):
         if total_ticks is not None and tick >= total_ticks:
             break
         time.sleep(interval_seconds)
-
-
 run_simulator(interval_seconds=2.0, total_ticks=10)

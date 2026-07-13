@@ -4,60 +4,35 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AtmoSync – Monitoring & Analytics</title>
-
-    <!-- Chart.js CDN -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
     </script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <!-- Google Font (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-
     <style>
-        /* ── RESET & BASE ── */
+        /* ─── RESET ─── */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Inter', sans-serif;
             background: #0b0e14;
             color: #e8edf5;
             padding: 20px;
-            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
         }
-
         .dashboard {
             max-width: 1440px;
             width: 100%;
             background: #11161e;
             border-radius: 28px;
             padding: 28px 32px 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            transition: all 0.2s;
         }
-
-        /* ── SCROLLBAR ── */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a212b;
-            border-radius: 8px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2d8cff;
-            border-radius: 8px;
-        }
-
-        /* ── HEADER ── */
         .header {
             display: flex;
             flex-wrap: wrap;
@@ -66,13 +41,11 @@
             margin-bottom: 22px;
             gap: 16px;
         }
-
         .header-left {
             display: flex;
             align-items: center;
             gap: 14px;
         }
-
         .logo-icon {
             width: 44px;
             height: 44px;
@@ -82,58 +55,38 @@
             align-items: center;
             justify-content: center;
             font-size: 22px;
-            font-weight: 700;
             color: #fff;
-            box-shadow: 0 0 30px rgba(45, 140, 255, 0.25);
-            flex-shrink: 0;
         }
-
         .header-title h1 {
             font-size: 22px;
             font-weight: 700;
-            letter-spacing: -0.3px;
             background: linear-gradient(135deg, #fff 60%, #7ab7ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
-
         .header-title span {
             font-size: 13px;
-            font-weight: 400;
             color: #8899b4;
-            -webkit-text-fill-color: #8899b4;
-            background: none;
             display: block;
-            margin-top: 2px;
-            letter-spacing: 0.2px;
         }
-
         .status-badge {
             display: flex;
             align-items: center;
             gap: 10px;
             background: rgba(0, 212, 170, 0.12);
             border: 1px solid rgba(0, 212, 170, 0.25);
-            padding: 8px 18px 8px 14px;
+            padding: 8px 18px;
             border-radius: 100px;
-            font-size: 13px;
-            font-weight: 500;
             color: #00d4aa;
-            backdrop-filter: blur(4px);
-            flex-shrink: 0;
         }
-
         .status-badge .dot {
             width: 10px;
             height: 10px;
             background: #00d4aa;
             border-radius: 50%;
-            animation: pulse-dot 2s ease-in-out infinite;
-            box-shadow: 0 0 12px rgba(0, 212, 170, 0.5);
+            animation: pulse 2s infinite;
         }
-
-        @keyframes pulse-dot {
+        @keyframes pulse {
             0%,
             100% {
                 opacity: 1;
@@ -144,8 +97,6 @@
                 transform: scale(0.85);
             }
         }
-
-        /* ── NAVIGATION ── */
         .nav {
             display: flex;
             flex-wrap: wrap;
@@ -154,9 +105,7 @@
             background: #1a212b;
             border-radius: 16px;
             margin-bottom: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
         }
-
         .nav-item {
             padding: 10px 22px;
             border-radius: 12px;
@@ -164,173 +113,104 @@
             font-weight: 500;
             color: #7a8aa0;
             cursor: pointer;
-            transition: all 0.25s ease;
             background: transparent;
             border: none;
-            font-family: inherit;
             display: flex;
             align-items: center;
             gap: 8px;
-            white-space: nowrap;
         }
-
-        .nav-item i {
-            font-size: 14px;
-        }
-
         .nav-item:hover {
             color: #c8d6e8;
             background: rgba(255, 255, 255, 0.04);
         }
-
         .nav-item.active {
             background: linear-gradient(135deg, #1f3a5f, #14273e);
             color: #7ab7ff;
-            box-shadow: 0 0 20px rgba(45, 140, 255, 0.08);
         }
-
-        /* ── GRID ── */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
         .grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
             gap: 18px;
             margin-bottom: 18px;
         }
-
         .card {
             background: #141c26;
             border-radius: 18px;
-            padding: 20px 22px 22px;
+            padding: 20px 22px;
             border: 1px solid rgba(255, 255, 255, 0.04);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
-
         .card:hover {
             border-color: rgba(45, 140, 255, 0.15);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
-
         .card-title {
             font-size: 13px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
             color: #7a8aa0;
             margin-bottom: 14px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
         }
-
         .card-title .badge {
             font-size: 10px;
-            font-weight: 600;
             background: rgba(45, 140, 255, 0.15);
             color: #5b9aff;
             padding: 2px 12px;
             border-radius: 100px;
-            text-transform: none;
-            letter-spacing: 0.2px;
         }
-
-        /* ── STAT CARDS ── */
         .stat-card {
             display: flex;
             flex-direction: column;
             gap: 4px;
         }
-
         .stat-card .stat-value {
             font-size: 30px;
             font-weight: 700;
-            letter-spacing: -0.5px;
             background: linear-gradient(135deg, #fff 60%, #7ab7ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
-
         .stat-card .stat-label {
             font-size: 13px;
             color: #7a8aa0;
             font-weight: 500;
         }
-
-        .stat-card .stat-change {
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 4px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .stat-change.up {
-            color: #00d4aa;
-        }
-        .stat-change.down {
-            color: #ff6b6b;
-        }
-
-        /* ── CHART WRAPPER ── */
         .chart-wrapper {
             position: relative;
             height: 180px;
             width: 100%;
         }
-
-        .chart-wrapper.tall {
-            height: 220px;
-        }
-        .chart-wrapper.medium {
-            height: 200px;
-        }
-
         .chart-wrapper canvas {
             width: 100% !important;
             height: 100% !important;
         }
-
-        /* ── TABLE ── */
         .table-wrap {
             overflow-x: auto;
-            margin-top: 2px;
         }
-
         .table-wrap table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
         }
-
         .table-wrap th {
             text-align: left;
-            font-weight: 600;
             color: #7a8aa0;
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
-            padding: 8px 6px 10px 6px;
+            padding: 8px 6px 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
-
         .table-wrap td {
             padding: 10px 6px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             color: #c8d6e8;
-            font-weight: 450;
         }
-
-        .table-wrap tr:last-child td {
-            border-bottom: none;
-        }
-        .table-wrap tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
         .risk-tag {
             display: inline-block;
             padding: 2px 12px;
@@ -350,8 +230,21 @@
             background: rgba(45, 140, 255, 0.2);
             color: #5b9aff;
         }
-
-        /* ── COL SPANS ── */
+        .arb-tag {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .arb-tag.reroute {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        .arb-tag.normal {
+            background: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+        }
         .col-span-3 {
             grid-column: span 3;
         }
@@ -367,436 +260,304 @@
         .col-span-7 {
             grid-column: span 7;
         }
-        .col-span-8 {
-            grid-column: span 8;
-        }
         .col-span-12 {
             grid-column: span 12;
         }
-
-        /* ── FOOTER ── */
         .footer {
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
             justify-content: space-between;
             padding-top: 16px;
             margin-top: 8px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 13px;
             color: #5a6a80;
+            flex-wrap: wrap;
             gap: 12px;
         }
-
         .footer .live-status {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-
         .footer .live-status .dot-small {
             width: 8px;
             height: 8px;
             background: #00d4aa;
             border-radius: 50%;
-            animation: pulse-dot 2s ease-in-out infinite;
+            animation: pulse 2s infinite;
         }
-
         .footer .update-time {
             display: flex;
             align-items: center;
             gap: 6px;
         }
-
-        .footer .update-time i {
-            color: #3a4a60;
-        }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 1200px) {
-            .col-span-3 {
-                grid-column: span 6;
-            }
-            .col-span-4 {
-                grid-column: span 6;
-            }
-            .col-span-5 {
-                grid-column: span 12;
-            }
-            .col-span-6 {
-                grid-column: span 12;
-            }
-            .col-span-7 {
-                grid-column: span 12;
-            }
-            .col-span-8 {
-                grid-column: span 12;
-            }
-            .dashboard {
-                padding: 20px 18px 16px;
-            }
-        }
-
         @media (max-width: 768px) {
             .col-span-3,
             .col-span-4,
             .col-span-5,
             .col-span-6,
-            .col-span-7,
-            .col-span-8 {
+            .col-span-7 {
                 grid-column: span 12;
-            }
-            .header {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-            .header-left {
-                flex-wrap: wrap;
-            }
-            .status-badge {
-                align-self: flex-start;
-            }
-            .nav {
-                gap: 2px;
-            }
-            .nav-item {
-                padding: 8px 14px;
-                font-size: 12px;
             }
             .nav-item span {
                 display: none;
             }
-            .card {
-                padding: 16px 16px 18px;
-            }
-            .stat-card .stat-value {
-                font-size: 26px;
-            }
-            .chart-wrapper {
-                height: 150px;
-            }
-            .chart-wrapper.tall {
-                height: 180px;
-            }
-            body {
-                padding: 12px;
-            }
-            .dashboard {
-                padding: 16px 12px 12px;
-                border-radius: 18px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header-title h1 {
-                font-size: 18px;
-            }
-            .logo-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 18px;
-            }
-            .status-badge {
-                font-size: 11px;
-                padding: 6px 14px;
-            }
-            .stat-card .stat-value {
-                font-size: 22px;
-            }
-            .footer {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-            }
-        }
-
-        /* ── UTILITY ── */
-        .glow-accent {
-            position: absolute;
-            top: -40%;
-            right: -10%;
-            width: 160px;
-            height: 160px;
-            background: radial-gradient(circle, rgba(45, 140, 255, 0.06), transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-        .alert-scroll {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .alert-scroll::-webkit-scrollbar {
-            width: 3px;
-        }
-        .alert-scroll::-webkit-scrollbar-thumb {
-            background: #2d8cff;
-            border-radius: 8px;
-        }
-        .chart-tip {
-            position: absolute;
-            bottom: 8px;
-            right: 16px;
-            font-size: 10px;
-            color: #3a4a60;
-            letter-spacing: 0.3px;
-        }
-
-        /* ── TAB TOGGLE ── */
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .tab-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 18px;
-            margin-bottom: 18px;
         }
     </style>
 </head>
 <body>
 
-    <div class="dashboard" id="app">
-
-        <!-- ═══ HEADER ═══ -->
+    <div class="dashboard">
+        <!-- HEADER -->
         <header class="header">
             <div class="header-left">
                 <div class="logo-icon">⛅</div>
                 <div class="header-title">
                     <h1>AtmoSync</h1>
-                    <span>Environmental Monitoring &amp; Spoilage Analytics</span>
+                    <span>Monitoring &amp; Spoilage Analytics</span>
                 </div>
             </div>
-            <div class="status-badge">
-                <span class="dot"></span>
-                All Systems Operational
-            </div>
+            <div class="status-badge"><span class="dot"></span> All Systems Operational</div>
         </header>
 
-        <!-- ═══ NAVIGATION ═══ -->
-        <nav class="nav" id="mainNav">
-            <button class="nav-item active" data-tab="monitoring">
-                <i class="fas fa-chart-pie"></i> <span>Monitoring</span>
-            </button>
-            <button class="nav-item" data-tab="analytics">
-                <i class="fas fa-chart-line"></i> <span>Analytics &amp; Alerts</span>
-            </button>
-            <button class="nav-item" data-tab="temperature">
-                <i class="fas fa-thermometer-half"></i> <span>Temperature</span>
-            </button>
-            <button class="nav-item" data-tab="humidity">
-                <i class="fas fa-tint"></i> <span>Humidity</span>
-            </button>
-            <button class="nav-item" data-tab="vibration">
-                <i class="fas fa-wave-square"></i> <span>Vibration</span>
-            </button>
-            <button class="nav-item" data-tab="sensors">
-                <i class="fas fa-microchip"></i> <span>Sensors</span>
-            </button>
-            <button class="nav-item" data-tab="alerts">
-                <i class="fas fa-bell"></i> <span>Alerts</span>
-            </button>
-            <button class="nav-item" data-tab="reports">
-                <i class="fas fa-file-alt"></i> <span>Reports</span>
-            </button>
+        <!-- NAV -->
+        <nav class="nav">
+            <button class="nav-item active" data-tab="monitoring"><i class="fas fa-chart-pie"></i> <span>Monitoring</span></button>
+            <button class="nav-item" data-tab="analytics"><i class="fas fa-chart-line"></i> <span>Analytics</span></button>
+            <button class="nav-item" data-tab="temp"><i class="fas fa-thermometer-half"></i> <span>Temp</span></button>
+            <button class="nav-item" data-tab="hum"><i class="fas fa-tint"></i> <span>Humidity</span></button>
+            <button class="nav-item" data-tab="vib"><i class="fas fa-wave-square"></i> <span>Vibration</span></button>
         </nav>
 
-        <!-- ════════════════════════════════════ -->
-        <!-- TAB 1: MONITORING (Existing Dashboard) -->
-        <!-- ════════════════════════════════════ -->
+        <!-- ═══ TAB 1: MONITORING ═══ -->
         <div id="tab-monitoring" class="tab-content active">
-            <div class="tab-grid">
-
-                <!-- STAT: Total Sensors -->
+            <div class="grid">
                 <div class="card col-span-3 stat-card">
-                    <div class="glow-accent"></div>
-                    <div class="stat-label"><i class="fas fa-microchip" style="margin-right:6px;color:#2d8cff;"></i> Total Sensors</div>
+                    <div class="stat-label"><i class="fas fa-microchip"></i> Total Sensors</div>
                     <div class="stat-value" id="totalSensors">0</div>
                 </div>
-
-                <!-- STAT: Avg Temperature -->
                 <div class="card col-span-3 stat-card">
-                    <div class="glow-accent"></div>
-                    <div class="stat-label"><i class="fas fa-thermometer-half" style="margin-right:6px;color:#ff9f43;"></i> Avg Temperature</div>
+                    <div class="stat-label"><i class="fas fa-thermometer-half"></i> Avg Temperature</div>
                     <div class="stat-value" id="avgTemp">0°C</div>
                 </div>
-
-                <!-- STAT: Avg Humidity -->
                 <div class="card col-span-3 stat-card">
-                    <div class="glow-accent"></div>
-                    <div class="stat-label"><i class="fas fa-tint" style="margin-right:6px;color:#4fc3f7;"></i> Avg Humidity</div>
+                    <div class="stat-label"><i class="fas fa-tint"></i> Avg Humidity</div>
                     <div class="stat-value" id="avgHumidity">0%</div>
                 </div>
-
-                <!-- STAT: Active Alerts -->
                 <div class="card col-span-3 stat-card">
-                    <div class="glow-accent" style="background:radial-gradient(circle,rgba(255,107,107,0.08),transparent 70%);"></div>
-                    <div class="stat-label"><i class="fas fa-exclamation-triangle" style="margin-right:6px;color:#ff6b6b;"></i> Active Alerts</div>
-                    <div class="stat-value" id="activeAlerts" style="background:linear-gradient(135deg,#ff6b6b,#ff9f43);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">0</div>
+                    <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Active Alerts</div>
+                    <div class="stat-value" id="activeAlerts" style="background:linear-gradient(135deg,#ff6b6b,#ff9f43);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">0</div>
                 </div>
-
-                <!-- CHART: Temperature Trend -->
                 <div class="card col-span-6">
-                    <div class="card-title"><span>🌡️ Temperature Trend (°C)</span><span class="badge">Last 7 days</span></div>
+                    <div class="card-title"><span>🌡️ Temperature Trend</span><span class="badge">7 days</span></div>
                     <div class="chart-wrapper"><canvas id="tempChart"></canvas></div>
-                    <div class="chart-tip">hover for details</div>
                 </div>
-
-                <!-- CHART: Humidity Trend -->
                 <div class="card col-span-6">
-                    <div class="card-title"><span>💧 Humidity Trend (%)</span><span class="badge">Last 7 days</span></div>
+                    <div class="card-title"><span>💧 Humidity Trend</span><span class="badge">7 days</span></div>
                     <div class="chart-wrapper"><canvas id="humidityChart"></canvas></div>
-                    <div class="chart-tip">hover for details</div>
                 </div>
-
-                <!-- TABLE: Recent Alerts -->
                 <div class="card col-span-12">
                     <div class="card-title"><span>🔔 Recent Alerts</span><span class="badge">Live</span></div>
-                    <div class="table-wrap alert-scroll" id="alertsContainer">
-                        <div id="alertsList" style="color:#c8d6e8; padding: 4px 0;">Loading alerts...</div>
+                    <div class="table-wrap" id="alertsContainer">
+                        <div id="alertsList">Loading...</div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- ════════════════════════════════════ -->
-        <!-- TAB 2: ANALYTICS (New Spoilage Page) -->
-        <!-- ════════════════════════════════════ -->
+        <!-- ═══ TAB 2: ANALYTICS (POWER BI LOGIC) ═══ -->
         <div id="tab-analytics" class="tab-content">
-            <div class="tab-grid">
-
-                <!-- STAT: Avg Spoilage Score -->
+            <div class="grid">
+                <!-- Stat Cards -->
                 <div class="card col-span-3 stat-card">
-                    <div class="glow-accent" style="background:radial-gradient(circle,rgba(255,107,107,0.08),transparent 70%);"></div>
-                    <div class="stat-label"><i class="fas fa-skull" style="margin-right:6px;color:#ff6b6b;"></i> Avg Spoilage Score</div>
-                    <div class="stat-value" id="spoilageScore" style="background:linear-gradient(135deg,#ff6b6b,#ff9f43);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">37.62</div>
+                    <div class="stat-label"><i class="fas fa-skull"></i> Avg Spoilage Score</div>
+                    <div class="stat-value" id="spoilageScore" style="background:linear-gradient(135deg,#ff6b6b,#ff9f43);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">0</div>
+                </div>
+                <div class="card col-span-3 stat-card">
+                    <div class="stat-label"><i class="fas fa-exclamation-circle"></i> High Risk Containers</div>
+                    <div class="stat-value" id="highRiskContainers" style="background:linear-gradient(135deg,#ff6b6b,#ff9f43);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">0</div>
+                </div>
+                <div class="card col-span-3 stat-card">
+                    <div class="stat-label"><i class="fas fa-route"></i> Reroute Recommended</div>
+                    <div class="stat-value" id="rerouteRecommended" style="background:linear-gradient(135deg,#00d4aa,#2d8cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">0</div>
+                </div>
+                <div class="card col-span-3 stat-card">
+                    <div class="stat-label"><i class="fas fa-bell"></i> Total Alerts</div>
+                    <div class="stat-value" id="totalAlertsAnalytics">0</div>
                 </div>
 
-                <!-- STAT: High Risk Containers -->
-                <div class="card col-span-3 stat-card">
-                    <div class="glow-accent" style="background:radial-gradient(circle,rgba(255,107,107,0.08),transparent 70%);"></div>
-                    <div class="stat-label"><i class="fas fa-exclamation-circle" style="margin-right:6px;color:#ff6b6b;"></i> High Risk Containers</div>
-                    <div class="stat-value" id="highRiskContainers" style="background:linear-gradient(135deg,#ff6b6b,#ff9f43);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">23</div>
-                </div>
-
-                <!-- STAT: Reroute Recommended -->
-                <div class="card col-span-3 stat-card">
-                    <div class="glow-accent" style="background:radial-gradient(circle,rgba(0,212,170,0.08),transparent 70%);"></div>
-                    <div class="stat-label"><i class="fas fa-route" style="margin-right:6px;color:#00d4aa;"></i> Reroute Recommended</div>
-                    <div class="stat-value" id="rerouteRecommended" style="background:linear-gradient(135deg,#00d4aa,#2d8cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">23</div>
-                </div>
-
-                <!-- STAT: Total Alerts -->
-                <div class="card col-span-3 stat-card">
-                    <div class="glow-accent"></div>
-                    <div class="stat-label"><i class="fas fa-bell" style="margin-right:6px;color:#5b9aff;"></i> Total Alerts</div>
-                    <div class="stat-value" id="totalAlertsAnalytics">140</div>
-                </div>
-
-                <!-- CHART: Risk Level Distribution (Doughnut) -->
+                <!-- Charts -->
                 <div class="card col-span-5">
-                    <div class="card-title"><span>📊 Risk Level Distribution</span><span class="badge">High/Medium/Low</span></div>
-                    <div class="chart-wrapper medium"><canvas id="riskDistChart"></canvas></div>
+                    <div class="card-title"><span>📊 Risk Distribution</span></div>
+                    <div class="chart-wrapper"><canvas id="riskDistChart"></canvas></div>
                 </div>
-
-                <!-- CHART: Spoilage Score by Container (Bar) -->
                 <div class="card col-span-7">
-                    <div class="card-title"><span>📈 Spoilage Score by Container</span><span class="badge">Top 8</span></div>
-                    <div class="chart-wrapper medium"><canvas id="spoilageBarChart"></canvas></div>
+                    <div class="card-title"><span>📈 Spoilage Score by Container</span></div>
+                    <div class="chart-wrapper"><canvas id="spoilageBarChart"></canvas></div>
                 </div>
 
-                <!-- TABLE: Container Risk List -->
+                <!-- Table -->
                 <div class="card col-span-12">
-                    <div class="card-title"><span>📋 Container Risk Overview</span><span class="badge">Live</span></div>
+                    <div class="card-title"><span>📋 Container Risk Overview</span></div>
                     <div class="table-wrap">
                         <table>
                             <thead>
-                                <tr><th>Container ID</th><th>Spoilage Score</th><th>Risk Level</th><th>Recommendation</th></tr>
+                                <tr>
+                                    <th>Container ID</th>
+                                    <th>Spoilage Score</th>
+                                    <th>Risk Level</th>
+                                    <th>Arbitrage Opportunity</th>
+                                </tr>
                             </thead>
-                            <tbody id="containerRiskTable">
-                                <!-- JS will populate -->
-                            </tbody>
+                            <tbody id="containerRiskTable"></tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- ═══ FOOTER ═══ -->
+        <!-- FOOTER -->
         <footer class="footer">
-            <div class="live-status">
-                <span class="dot-small"></span>
-                <span><strong>Live Status</strong> · Online</span>
-            </div>
-            <div class="update-time">
-                <i class="far fa-clock"></i>
-                <span>Last Updated: <strong id="lastUpdateTime">Just now</strong></span>
-            </div>
+            <div class="live-status"><span class="dot-small"></span> <span><strong>Live</strong> · Online</span></div>
+            <div class="update-time"><i class="far fa-clock"></i> <span>Last Updated: <strong id="lastUpdateTime">Just now</strong></span></div>
         </footer>
-
     </div>
 
     <script>
-        (function() {
-            'use strict';
+        // ─── API BASE ───
+        const API_BASE = 'http://localhost:8000';
 
-            // ── CHART INSTANCES ──
-            let tempChartInstance = null;
-            let humidityChartInstance = null;
-            let riskDistChartInstance = null;
-            let spoilageBarChartInstance = null;
+        // ─── DOM REFS ───
+        const $ = id => document.getElementById(id);
 
-            // ── DOM REFS (Monitoring) ──
-            const totalSensorsEl = document.getElementById('totalSensors');
-            const avgTempEl = document.getElementById('avgTemp');
-            const avgHumidityEl = document.getElementById('avgHumidity');
-            const activeAlertsEl = document.getElementById('activeAlerts');
-            const alertsListEl = document.getElementById('alertsList');
-            const lastUpdateEl = document.getElementById('lastUpdateTime');
+        // ─── CHART INSTANCES ───
+        let tempChart, humidityChart, riskChart, spoilageBarChart;
 
-            // ── DOM REFS (Analytics) ──
-            const spoilageScoreEl = document.getElementById('spoilageScore');
-            const highRiskContainersEl = document.getElementById('highRiskContainers');
-            const rerouteRecommendedEl = document.getElementById('rerouteRecommended');
-            const totalAlertsAnalyticsEl = document.getElementById('totalAlertsAnalytics');
-            const containerRiskTableEl = document.getElementById('containerRiskTable');
+        // ─── TAB SWITCHING ───
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
 
-            // ── TAB SWITCHING ──
-            const navItems = document.querySelectorAll('.nav-item');
-            const tabContents = {
-                monitoring: document.getElementById('tab-monitoring'),
-                analytics: document.getElementById('tab-analytics'),
-                // other tabs just show monitoring for now
-            };
-
-            // Function to safely render charts (needs visible canvas)
-            function renderAnalyticsCharts() {
-                if (riskDistChartInstance) {
-                    riskDistChartInstance.destroy();
-                    riskDistChartInstance = null;
+                const tab = this.dataset.tab;
+                if (tab === 'monitoring') {
+                    document.getElementById('tab-monitoring').classList.add('active');
+                } else if (tab === 'analytics') {
+                    document.getElementById('tab-analytics').classList.add('active');
+                    setTimeout(fetchAnalytics, 200);
+                } else {
+                    document.getElementById('tab-monitoring').classList.add('active');
                 }
-                if (spoilageBarChartInstance) {
-                    spoilageBarChartInstance.destroy();
-                    spoilageBarChartInstance = null;
+            });
+        });
+
+        // ─── FETCH MONITORING ───
+        async function fetchMonitoring() {
+            try {
+                const res = await fetch(`${API_BASE}/api/dashboard`);
+                const data = await res.json();
+
+                if (data.error) {
+                    console.error('API Error:', data.error);
+                    return;
                 }
 
-                // Risk Distribution Doughnut
-                const ctx1 = document.getElementById('riskDistChart').getContext('2d');
-                riskDistChartInstance = new Chart(ctx1, {
+                $('totalSensors').innerText = data.stats?.total_sensors || 0;
+                $('avgTemp').innerText = (data.stats?.avg_temp || 0) + '°C';
+                $('avgHumidity').innerText = (data.stats?.avg_humidity || 0) + '%';
+                $('activeAlerts').innerText = data.stats?.active_alerts || 0;
+
+                // Alerts Table
+                let html = '<table><thead><tr><th>Time</th><th>Sensor</th><th>Temp</th><th>Alert</th></tr></thead><tbody>';
+                if (data.alerts && data.alerts.length > 0) {
+                    data.alerts.forEach(a => {
+                        html +=
+                            `<tr><td>${a.time}</td><td>${a.sensor}</td><td>${a.temp}°C</td><td style="color:#ff6b6b;">🔥 High</td></tr>`;
+                    });
+                } else {
+                    html += `<tr><td colspan="4" style="text-align:center;color:#5a6a80;">No alerts found</td></tr>`;
+                }
+                html += '</tbody></table>';
+                $('alertsList').innerHTML = html;
+
+                // Charts
+                const days = data.trends?.days || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                const temps = data.trends?.temperatures || [0, 0, 0, 0, 0, 0, 0];
+                const hums = data.trends?.humidities || [0, 0, 0, 0, 0, 0, 0];
+
+                if (tempChart) tempChart.destroy();
+                const ctx1 = document.getElementById('tempChart').getContext('2d');
+                tempChart = new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: days,
+                        datasets: [{
+                            label: 'Temperature (°C)',
+                            data: temps,
+                            borderColor: '#2d8cff',
+                            backgroundColor: 'rgba(45,140,255,0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+
+                if (humidityChart) humidityChart.destroy();
+                const ctx2 = document.getElementById('humidityChart').getContext('2d');
+                humidityChart = new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: days,
+                        datasets: [{
+                            label: 'Humidity (%)',
+                            data: hums,
+                            borderColor: '#4fc3f7',
+                            backgroundColor: 'rgba(79,195,247,0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+
+            } catch (e) {
+                console.error('❌ Monitoring Error:', e);
+            }
+        }
+
+        // ─── FETCH ANALYTICS (POWER BI LOGIC) ───
+        async function fetchAnalytics() {
+            try {
+                const res = await fetch(`${API_BASE}/api/analytics`);
+                const data = await res.json();
+
+                if (data.error) {
+                    console.error('API Error:', data.error);
+                    $('spoilageScore').innerText = 'Error';
+                    return;
+                }
+
+                // ─── Update Stat Cards ───
+                $('spoilageScore').innerText = data.summary?.avg_spoilage_score || 0;
+                $('highRiskContainers').innerText = data.summary?.high_risk_containers || 0;
+                $('rerouteRecommended').innerText = data.summary?.reroute_recommended || 0;
+                $('totalAlertsAnalytics').innerText = data.summary?.total_alerts || 0;
+
+                // ─── Risk Distribution Chart ───
+                const dist = data.risk_distribution || { high: 0, medium: 0, low: 0 };
+                if (riskChart) riskChart.destroy();
+                const ctx3 = document.getElementById('riskDistChart').getContext('2d');
+                riskChart = new Chart(ctx3, {
                     type: 'doughnut',
                     data: {
                         labels: ['High', 'Medium', 'Low'],
                         datasets: [{
-                            data: [23, 61, 35],
+                            data: [dist.high, dist.medium, dist.low],
                             backgroundColor: ['#ff6b6b', '#ff9f43', '#2d8cff'],
                             borderColor: '#141c26',
-                            borderWidth: 3,
-                            hoverOffset: 8
+                            borderWidth: 3
                         }]
                     },
                     options: {
@@ -806,264 +567,82 @@
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: {
-                                    color: '#7a8aa0',
-                                    font: { family: 'Inter', size: 11, weight: '500' },
-                                    padding: 14,
-                                    usePointStyle: true,
-                                    pointStyle: 'circle'
-                                }
+                                labels: { color: '#7a8aa0', usePointStyle: true }
                             }
-                        },
-                        animation: { animateRotate: true, duration: 1000 }
+                        }
                     }
                 });
 
-                // Spoilage Score Bar Chart
-                const ctx2 = document.getElementById('spoilageBarChart').getContext('2d');
-                const barColors = ['#ff6b6b', '#ff6b6b', '#ff9f43', '#ff9f43', '#2d8cff', '#2d8cff', '#2d8cff', '#2d8cff'];
-                spoilageBarChartInstance = new Chart(ctx2, {
+                // ─── Spoilage Bar Chart ───
+                const top = data.top_containers || [];
+                if (spoilageBarChart) spoilageBarChart.destroy();
+                const ctx4 = document.getElementById('spoilageBarChart').getContext('2d');
+                const colors = ['#ff6b6b', '#ff6b6b', '#ff9f43', '#ff9f43', '#2d8cff', '#2d8cff', '#2d8cff', '#2d8cff'];
+                spoilageBarChart = new Chart(ctx4, {
                     type: 'bar',
                     data: {
-                        labels: ['CNT-1001', 'CNT-1002', 'CNT-1003', 'CNT-1004', 'CNT-1005', 'CNT-1006', 'CNT-1007',
-                            'CNT-1008'
-                        ],
+                        labels: top.map(c => c.id),
                         datasets: [{
                             label: 'Spoilage Score',
-                            data: [48.6, 42.3, 39.8, 36.4, 35.6, 33.2, 31.7, 29.5],
-                            backgroundColor: barColors,
-                            borderRadius: 6,
-                            borderSkipped: false,
-                            barPercentage: 0.65,
+                            data: top.map(c => c.score),
+                            backgroundColor: colors.slice(0, top.length),
+                            borderRadius: 6
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            x: {
-                                grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-                                ticks: { color: '#5a6a80', font: { family: 'Inter', size: 10 } }
-                            },
-                            y: {
-                                grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false },
-                                ticks: { color: '#5a6a80', font: { family: 'Inter', size: 10 } },
-                                min: 20,
-                                max: 55
-                            }
-                        }
+                        plugins: { legend: { display: false } },
+                        scales: { y: { min: 0, max: 50 } } // Adjusted for Power BI formula (scores ~30-40)
                     }
                 });
-            }
 
-            function populateContainerTable() {
-                const data = [
-                    { id: 'CNT-1001', score: 48.6, risk: 'High' },
-                    { id: 'CNT-1002', score: 42.3, risk: 'High' },
-                    { id: 'CNT-1003', score: 39.8, risk: 'Medium' },
-                    { id: 'CNT-1004', score: 36.4, risk: 'Medium' },
-                    { id: 'CNT-1005', score: 35.6, risk: 'Medium' },
-                    { id: 'CNT-1006', score: 33.2, risk: 'Medium' },
-                    { id: 'CNT-1007', score: 31.7, risk: 'Low' },
-                    { id: 'CNT-1008', score: 29.5, risk: 'Low' },
-                    { id: 'CNT-1009', score: 28.1, risk: 'Low' },
-                    { id: 'CNT-1010', score: 26.3, risk: 'Low' },
-                    { id: 'CNT-1011', score: 24.7, risk: 'Low' },
-                    { id: 'CNT-1012', score: 22.9, risk: 'Low' },
-                ];
-
+                // ─── Container Table (with Arbitrage Opportunity) ───
+                const all = data.all_containers || [];
                 let html = '';
-                data.forEach(row => {
-                    const riskClass = row.risk.toLowerCase();
-                    const rec = row.risk === 'High' ? '⚠️ Reroute' : row.risk === 'Medium' ? '📊 Monitor' :
-                        '✅ Normal';
-                    html += `<tr>
-                                <td><strong>${row.id}</strong></td>
-                                <td>${row.score}</td>
-                                <td><span class="risk-tag ${riskClass}">${row.risk}</span></td>
-                                <td>${rec}</td>
-                            </tr>`;
-                });
-                containerRiskTableEl.innerHTML = html;
-            }
-
-            // ── NAVIGATION CLICK ──
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    navItems.forEach(n => n.classList.remove('active'));
-                    this.classList.add('active');
-
-                    const tab = this.dataset.tab;
-
-                    // Hide all tab contents
-                    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-
-                    // Show selected
-                    if (tab === 'analytics') {
-                        document.getElementById('tab-analytics').classList.add('active');
-                        // Render charts (they need visible canvas)
-                        setTimeout(() => {
-                            renderAnalyticsCharts();
-                            populateContainerTable();
-                        }, 100);
-                    } else if (tab === 'monitoring') {
-                        document.getElementById('tab-monitoring').classList.add('active');
-                        // Re-render monitoring charts if needed (they are already rendered)
-                        setTimeout(() => {
-                            renderMonitoringCharts();
-                        }, 100);
-                    } else {
-                        // Default fallback to monitoring for other tabs
-                        document.getElementById('tab-monitoring').classList.add('active');
-                    }
-                });
-            });
-
-            // ── RENDER MONITORING CHARTS ──
-            function renderMonitoringCharts() {
-                if (tempChartInstance) {
-                    tempChartInstance.destroy();
-                    tempChartInstance = null;
+                if (all.length > 0) {
+                    all.forEach(c => {
+                        const riskClass = c.risk.toLowerCase();
+                        // Use arbitrage_opportunity from backend (Power BI logic)
+                        const arb = c.arbitrage_opportunity || (c.risk === 'High' ? 'Reroute Shipment' :
+                            'Normal');
+                        const arbClass = arb === 'Reroute Shipment' ? 'reroute' : 'normal';
+                        html += `<tr>
+                                    <td><strong>${c.id}</strong></td>
+                                    <td>${c.score}</td>
+                                    <td><span class="risk-tag ${riskClass}">${c.risk}</span></td>
+                                    <td><span class="arb-tag ${arbClass}">${arb}</span></td>
+                                </tr>`;
+                    });
+                } else {
+                    html = `<tr><td colspan="4" style="text-align:center;color:#5a6a80;">No container data available</td></tr>`;
                 }
-                if (humidityChartInstance) {
-                    humidityChartInstance.destroy();
-                    humidityChartInstance = null;
-                }
+                $('containerRiskTable').innerHTML = html;
 
-                const tempCtx = document.getElementById('tempChart').getContext('2d');
-                const tempGrad = tempCtx.createLinearGradient(0, 0, 0, 180);
-                tempGrad.addColorStop(0, 'rgba(45, 140, 255, 0.25)');
-                tempGrad.addColorStop(1, 'rgba(45, 140, 255, 0.01)');
-                tempChartInstance = new Chart(tempCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{
-                            label: 'Temperature (°C)',
-                            data: [26.4, 28.1, 29.7, 31.2, 30.8, 32.5, 34.2],
-                            borderColor: '#2d8cff',
-                            backgroundColor: tempGrad,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#2d8cff',
-                            pointBorderColor: '#0b0e14',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 7,
-                            borderWidth: 2.5
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }, ticks: { color: '#5a6a80',
-                                    font: { family: 'Inter', size: 10 } } },
-                            y: { grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }, ticks: { color: '#5a6a80',
-                                    font: { family: 'Inter', size: 10 } }, min: 24, max: 36 }
-                        }
-                    }
-                });
-
-                const humCtx = document.getElementById('humidityChart').getContext('2d');
-                const humGrad = humCtx.createLinearGradient(0, 0, 0, 180);
-                humGrad.addColorStop(0, 'rgba(79, 195, 247, 0.2)');
-                humGrad.addColorStop(1, 'rgba(79, 195, 247, 0.01)');
-                humidityChartInstance = new Chart(humCtx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{
-                            label: 'Humidity (%)',
-                            data: [68, 72, 65, 58, 62, 55, 48],
-                            borderColor: '#4fc3f7',
-                            backgroundColor: humGrad,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#4fc3f7',
-                            pointBorderColor: '#0b0e14',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 7,
-                            borderWidth: 2.5
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }, ticks: { color: '#5a6a80',
-                                    font: { family: 'Inter', size: 10 } } },
-                            y: { grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }, ticks: { color: '#5a6a80',
-                                    font: { family: 'Inter', size: 10 } }, min: 40, max: 80 }
-                        }
-                    }
-                });
+            } catch (e) {
+                console.error('❌ Analytics Error:', e);
+                $('spoilageScore').innerText = '⚠️ Error';
+                $('containerRiskTable').innerHTML =
+                    `<tr><td colspan="4" style="text-align:center;color:#ff6b6b;">Failed to load analytics data. Check console.</td></tr>`;
             }
+        }
 
-            // ── UPDATE MONITORING STATS (Mock API call) ──
-            function updateMonitoringStats() {
-                // Mock data (since backend might not be running)
-                totalSensorsEl.innerText = '48';
-                avgTempEl.innerText = '29.7°C';
-                avgHumidityEl.innerText = '62.4%';
-                activeAlertsEl.innerText = '5';
+        // ─── UPDATE TIMESTAMP ───
+        function updateTimestamp() {
+            const now = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            $('lastUpdateTime').innerText =
+                `${months[now.getMonth()]} ${pad(now.getDate())}, ${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
+        }
 
-                const alerts = [
-                    { time: '2026-07-08 22:18:10', sensor: 'SEN-1004', temp: '34.62' },
-                    { time: '2026-07-08 22:21:05', sensor: 'SEN-1002', temp: '33.91' },
-                    { time: '2026-07-08 22:15:44', sensor: 'SEN-1001', temp: '32.78' },
-                    { time: '2026-07-08 22:10:33', sensor: 'SEN-1005', temp: '31.89' },
-                    { time: '2026-07-08 22:05:12', sensor: 'SEN-1003', temp: '31.22' },
-                ];
-                let html = '<table><thead><tr><th>Time</th><th>Sensor ID</th><th>Temp (°C)</th><th>Alert</th></tr></thead><tbody>';
-                alerts.forEach(a => {
-                    html +=
-                        `<tr><td>${a.time}</td><td>${a.sensor}</td><td>${a.temp}</td><td style="color:#ff6b6b;">🔥 High Temp</td></tr>`;
-                });
-                html += '</tbody></table>';
-                alertsListEl.innerHTML = html;
-            }
-
-            // ── UPDATE TIMESTAMP ──
-            function updateTimestamp() {
-                const now = new Date();
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const pad = (n) => String(n).padStart(2, '0');
-                const dateStr =
-                    `${months[now.getMonth()]} ${pad(now.getDate())}, ${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
-                lastUpdateEl.textContent = dateStr;
-            }
-
-            // ── INIT ──
-            function init() {
-                // Monitoring
-                renderMonitoringCharts();
-                updateMonitoringStats();
-
-                // Analytics (prep data, charts will render on tab click)
-                // Pre-fill stats
-                spoilageScoreEl.innerText = '37.62';
-                highRiskContainersEl.innerText = '23';
-                rerouteRecommendedEl.innerText = '23';
-                totalAlertsAnalyticsEl.innerText = '140';
-
-                // Timestamp
-                updateTimestamp();
-                setInterval(updateTimestamp, 30000);
-
-                // Auto-refresh monitoring stats every 30s
-                setInterval(updateMonitoringStats, 30000);
-            }
-
-            init();
-
-        })();
+        // ─── INIT ───
+        fetchMonitoring();
+        // Pre-fetch analytics once in background
+        setTimeout(fetchAnalytics, 500);
+        updateTimestamp();
+        setInterval(updateTimestamp, 30000);
+        setInterval(fetchMonitoring, 30000);
     </script>
 
 </body>

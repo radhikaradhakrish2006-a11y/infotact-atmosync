@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>🔍 Backend Connection Test</h1>
+    <div id="output" style="background:#1a1a1a; color:#00ff00; padding:20px; font-family:monospace; white-space:pre-wrap;">
+        Loading...
+    </div>
+
+    <script>
+        async function testAPI() {
+            const output = document.getElementById('output');
+            output.innerText = '⏳ Fetching data from backend...\n';
+
+            try {
+                // 1. Test /api/debug
+                const res1 = await fetch('http://localhost:8000/api/debug');
+                const data1 = await res1.json();
+                output.innerText += '✅ /api/debug Response:\n' + JSON.stringify(data1, null, 2) + '\n\n';
+
+                // 2. Test /api/dashboard
+                const res2 = await fetch('http://localhost:8000/api/dashboard');
+                const data2 = await res2.json();
+                output.innerText += '✅ /api/dashboard Response:\n' + JSON.stringify(data2, null, 2) + '\n\n';
+
+                // 3. Test /api/analytics
+                const res3 = await fetch('http://localhost:8000/api/analytics');
+                const data3 = await res3.json();
+                output.innerText += '✅ /api/analytics Response:\n' + JSON.stringify(data3, null, 2) + '\n\n';
+
+                output.innerText += '✅✅ All APIs connected successfully! Check your data above.';
+
+            } catch (e) {
+                output.innerText = '❌❌ ERROR: ' + e.message + '\n\n💡 Tips:\n1. Is Backend running? (py -m uvicorn dashboard:app --reload)\n2. Did you open this via "Live Server" (not double-click)?\n3. Is the port 8000 correct?';
+            }
+        }
+
+        testAPI();
+    </script>
+</body>
+</html>

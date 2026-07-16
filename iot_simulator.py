@@ -34,8 +34,7 @@ def generate_reading(container_id, tick):
         "vibration_level": vibration,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
-
-
+#run container
 def run_simulator(interval_seconds=2.0, total_ticks=10):
     tick = 0
     print("AtmoSync IoT Simulator started...\n")

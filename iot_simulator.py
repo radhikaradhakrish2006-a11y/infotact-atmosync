@@ -2,7 +2,6 @@ import json
 import random
 import time
 from datetime import datetime, timezone
-
 CONTAINER_IDS = [
     "CNT-1001","CNT-1002","CNT-1003","CNT-1004",
     "CNT-1005","CNT-1006","CNT-1007","CNT-1008",
@@ -14,8 +13,6 @@ BASELINE_HUMIDITY_RANGE = (40.0, 70.0)
 VIBRATION_RANGE = (0.0, 2.5)
 
 DRIFTING_CONTAINERS = {"CNT-1001"}
-
-
 def generate_reading(container_id, tick):
     temp_low, temp_high = BASELINE_TEMP_RANGE
     hum_low, hum_high = BASELINE_HUMIDITY_RANGE

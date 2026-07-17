@@ -13,8 +13,6 @@ conn = snowflake.connector.connect(
 )
 
 cur = conn.cursor()
-
-
 consumer = KafkaConsumer(
     "sensor-data",
     bootstrap_servers="localhost:9092",

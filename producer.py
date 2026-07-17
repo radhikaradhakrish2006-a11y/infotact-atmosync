@@ -8,8 +8,7 @@ producer = KafkaProducer(
     bootstrap_servers='localhost:9092',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
-
-# 12 Container IDs
+# 12 Container IDs 
 container_ids = [
     "CNT-1001",
     "CNT-1002",

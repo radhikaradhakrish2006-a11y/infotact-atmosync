@@ -1,4 +1,3 @@
-#snowflake connect
 import snowflake.connector
 conn = snowflake.connector.connect(
     user="RADHIKA",

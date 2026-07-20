@@ -34,11 +34,7 @@ def get_snowflake_conn():
     except Exception as e:
         logger.error(f"❌ Snowflake connection failed: {e}")
         raise
-
-# ──────────────────────────────────────────────
-# DEBUG ENDPOINTS
-# ──────────────────────────────────────────────
-
+#debugging the end point
 @app.get("/api/tables")
 def list_tables():
     """List all tables in the schema (debug)."""

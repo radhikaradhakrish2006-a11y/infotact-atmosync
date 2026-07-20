@@ -34,7 +34,6 @@ def get_snowflake_conn():
     except Exception as e:
         logger.error(f"❌ Snowflake connection failed: {e}")
         raise
-#debugging the end point
 @app.get("/api/tables")
 def list_tables():
     """List all tables in the schema (debug)."""
@@ -44,7 +43,6 @@ def list_tables():
     tables = cur.fetchall()
     conn.close()
     return {"tables": [t[1] for t in tables]}
-
 @app.get("/api/debug")
 def debug_data():
     """Check row counts in sensor_transformation table."""

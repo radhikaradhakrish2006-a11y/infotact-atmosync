@@ -1,5 +1,5 @@
+#snowflake connect
 import snowflake.connector
-
 conn = snowflake.connector.connect(
     user="RADHIKA",
     password="Radhika56@2006",
@@ -8,6 +8,5 @@ conn = snowflake.connector.connect(
     database="ATMOSYNC_DB",
     schema="PUBLIC"
 )
-
 print("Connected Successfully!")
 conn.close()

@@ -25,7 +25,7 @@ container_ids = [
 ]
 
 print("Sending sensor data to Kafka...")
-
+#sending sensor data to kafka
 while True:
     data = {
         "container_id": random.choice(container_ids),

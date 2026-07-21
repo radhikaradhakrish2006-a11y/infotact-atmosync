@@ -65,11 +65,7 @@ def debug_data():
         }
     except Exception as e:
         return {"error": str(e), "status": "❌ Query failed"}
-
-# ──────────────────────────────────────────────
 # MONITORING API
-# ──────────────────────────────────────────────
-
 @app.get("/api/dashboard")
 def get_dashboard_data():
     """

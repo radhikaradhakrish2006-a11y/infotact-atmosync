@@ -2,7 +2,6 @@ from kafka import KafkaProducer
 import json
 import random
 import time
-
 # Kafka Producer
 producer = KafkaProducer(
     bootstrap_servers='localhost:9092',
@@ -34,10 +33,7 @@ while True:
         "vibration": round(random.uniform(0, 5), 2),
         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
     }
-
     producer.send("sensor-data", data)
     producer.flush()
-
     print("Sent:", data)
-
     time.sleep(2)
